@@ -1,0 +1,448 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>谈谈JS的包装对象 | 小黑</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="小黑">
+    
+
+    
+    <meta name="description" content="在JavaScript中，一切皆对象。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="谈谈JS的包装对象">
+<meta property="og:url" content="http://yoursite.com/2016/05/03/Javascript/谈谈JS的包装对象/index.html">
+<meta property="og:site_name" content="小黑">
+<meta property="og:description" content="在JavaScript中，一切皆对象。">
+<meta property="og:updated_time" content="2016-05-03T02:50:36.883Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="谈谈JS的包装对象">
+<meta name="twitter:description" content="在JavaScript中，一切皆对象。">
+
+    
+    <link rel="alternative" href="/atom.xml" title="小黑" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="小黑" title="小黑"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="小黑">小黑</a></h1>
+				<h2 class="blog-motto">关注web前端开发个人博客网站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">关于我</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/03/Javascript/谈谈JS的包装对象/" title="谈谈JS的包装对象" itemprop="url">谈谈JS的包装对象</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="小黑" target="_blank" itemprop="author">小黑</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-03T02:17:51.000Z" itemprop="datePublished"> 发表于 2016-05-03</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#测试题"><span class="toc-number">2.</span> <span class="toc-text">测试题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#定义"><span class="toc-number">3.</span> <span class="toc-text">定义</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#剖析"><span class="toc-number">4.</span> <span class="toc-text">剖析</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#区别"><span class="toc-number">5.</span> <span class="toc-text">区别</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#实际运用"><span class="toc-number">6.</span> <span class="toc-text">实际运用</span></a></li></ol>
+		
+		</div>
+		
+		<h1 id="&#x524D;&#x8A00;"><a href="#&#x524D;&#x8A00;" class="headerlink" title="&#x524D;&#x8A00;"></a>&#x524D;&#x8A00;</h1><p>&#x5728;JavaScript&#x4E2D;&#xFF0C;&#x201C;&#x4E00;&#x5207;&#x7686;&#x5BF9;&#x8C61;&#x201D;&#xFF0C;&#x6570;&#x7EC4;&#x548C;&#x51FD;&#x6570;&#x672C;&#x8D28;&#x4E0A;&#x90FD;&#x662F;&#x5BF9;&#x8C61;&#xFF0C;&#x5C31;&#x8FDE;&#x4E09;&#x79CD;&#x539F;&#x59CB;&#x7C7B;&#x578B;&#x2014;&#x2014;&#x6570;&#x503C;&#x3001;&#x5B57;&#x7B26;&#x4E32;&#x3001;&#x5E03;&#x5C14;&#x503C;&#x2014;&#x2014;&#x5728;&#x4E00;&#x5B9A;&#x6761;&#x4EF6;&#x4E0B;&#xFF0C;&#x4E5F;&#x4F1A;&#x81EA;&#x52A8;&#x8F6C;&#x4E3A;&#x5BF9;&#x8C61;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x539F;&#x59CB;&#x7C7B;&#x578B;&#x7684;&#x201C;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#x201D;&#x3002;</p>
+<h1 id="&#x6D4B;&#x8BD5;&#x9898;"><a href="#&#x6D4B;&#x8BD5;&#x9898;" class="headerlink" title="&#x6D4B;&#x8BD5;&#x9898;"></a>&#x6D4B;&#x8BD5;&#x9898;</h1><p>&#x5F00;&#x5934;&#xFF0C;&#x5148;&#x7ED9;&#x5927;&#x5BB6;&#x4E00;&#x9053;&#x9898;&#xFF0C;&#x6D4B;&#x8BD5;&#x4E0B;&#xFF1A;    </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var <span class="built_in">test</span> = <span class="string">&quot;test&quot;</span>;</span><br><span class="line">    test.a = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">console.log(test.a);</span><br></pre></td></tr></table></figure>
+<p>&#x6B63;&#x786E;&#x7B54;&#x6848;&#x662F;&#x201D;hello&#x201D;&#x2026;&#x2026;</p>
+<p>&#x2192;_&#x2192;&#x989D;&#xFF0C;&#x4F60;&#x4E0D;&#x4F1A;&#x771F;&#x7684;&#x76F8;&#x4FE1;&#x4E86;&#x5427;&#xFF01;&#x5929;&#x771F;&#x7684;&#x9A9A;&#x5E74;&#x5440;&#xFF0C;&#x5B9E;&#x8DF5;&#x51FA;&#x771F;&#x77E5;&#xFF0C;&#x81EA;&#x5DF1;&#x53BB;&#x6D4F;&#x89C8;&#x5668;&#x8BD5;&#x4E0B;&#x5427;&#x3002;<br>&#x771F;&#x6B63;&#x7684;&#x7B54;&#x6848;&#x662F;&#x2014;&#x2014;<strong>undefined</strong>&#x3002;<br>&#x4E3A;&#x4EC0;&#x4E48;&#xFF1F;&#x522B;&#x6025;&#xFF0C;&#x4E14;&#x542C;&#x6211;&#x6162;&#x6162;&#x9053;&#x6765;&#xFF0C;&#x4E0B;&#x9762;&#x9686;&#x91CD;&#x4ECB;&#x7ECD;&#x6211;&#x4EEC;&#x6587;&#x7AE0;&#x7684;&#x4E3B;&#x89D2;&#x7684;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#x3002;</p>
+<h1 id="&#x5B9A;&#x4E49;"><a href="#&#x5B9A;&#x4E49;" class="headerlink" title="&#x5B9A;&#x4E49;"></a>&#x5B9A;&#x4E49;</h1><p>&#x5728;JavaScript&#x4E2D;&#xFF0C;&#x201C;&#x4E00;&#x5207;&#x7686;&#x5BF9;&#x8C61;&#x201D;&#xFF0C;&#x6570;&#x7EC4;&#x548C;&#x51FD;&#x6570;&#x672C;&#x8D28;&#x4E0A;&#x90FD;&#x662F;&#x5BF9;&#x8C61;&#xFF0C;&#x5C31;&#x8FDE;&#x4E09;&#x79CD;&#x539F;&#x59CB;&#x7C7B;&#x578B;&#x2014;&#x2014;&#x6570;&#x503C;&#x3001;&#x5B57;&#x7B26;&#x4E32;&#x3001;&#x5E03;&#x5C14;&#x503C;&#x2014;&#x2014;&#x5728;&#x4E00;&#x5B9A;&#x6761;&#x4EF6;&#x4E0B;&#xFF0C;&#x4E5F;&#x4F1A;&#x81EA;&#x52A8;&#x8F6C;&#x4E3A;&#x5BF9;&#x8C61;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x539F;&#x59CB;&#x7C7B;&#x578B;&#x7684;&#x201C;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#x201D;&#x3002;<br>&#x901A;&#x4FD7;&#x6765;&#x8BB2;,&#x5C31;&#x662F;&#x5B57;&#x7B26;&#x4E32;&#xFF0C;&#x6570;&#x503C;&#xFF0C;&#x5B57;&#x7B26;&#x4E32;&#xFF0C;&#x8FD9;&#x4E9B;&#x5355;&#x8EAB;&#x72D7;&#x770B;&#x5176;&#x5B83;&#x4EBA;&#x90FD;&#x6709;&#x5BF9;&#x8C61;&#xFF0C;&#x975E;&#x5E38;&#x4E0D;&#x723D;&#xFF0C;&#x6240;&#x4EE5;&#x81EA;&#x5DF1;&#x4E5F;&#x641E;&#x4E86;&#x4E2A;&#x5BF9;&#x8C61;&#xFF0C;&#x540D;&#x5B57;&#x53EB;&#x5305;&#x88C5;&#x3002;</p>
+<h1 id="&#x5256;&#x6790;"><a href="#&#x5256;&#x6790;" class="headerlink" title="&#x5256;&#x6790;"></a>&#x5256;&#x6790;</h1><p>&#x4E00;&#x822C;&#x6765;&#x8BF4;&#xFF0C;&#x53EA;&#x6709;&#x5BF9;&#x8C61;&#x662F;&#x53EF;&#x4EE5;&#x5BF9;&#x5C5E;&#x6027;&#x8FDB;&#x884C;&#x8BFB;&#x5199;&#x64CD;&#x4F5C;&#x7684;&#x3002;&#x4F46;&#x662F;&#x806A;&#x660E;&#x7684;&#x9A9A;&#x5E74;&#xFF0C;&#x4F60;&#x6709;&#x6CA1;&#x6709;&#x53D1;&#x73B0;&#xFF0C;&#x5E73;&#x65F6;&#x6211;&#x4EEC;&#x7528;&#x5F97;&#x5F88;&#x591A;&#x7684;&#x5B57;&#x7B26;&#x4E32;&#x65B9;&#x6CD5;&#x548C;&#x5C5E;&#x6027;&#xFF0C;&#x90FD;&#x662F;&#x76F4;&#x63A5;&#x901A;&#x8FC7;&#x201D;.&#x201D;&#x64CD;&#x4F5C;&#x7B26;&#x8BBF;&#x95EE;&#x7684;&#x3002;&#x6BD4;&#x5982;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;hello world&quot;</span>.length;</span><br><span class="line"><span class="string">&quot;this a string&quot;</span>.indexOf(<span class="string">&quot;a&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>&#x5176;&#x5B9E;&#xFF0C;&#x5728;&#x6211;&#x4EEC;&#x8C03;&#x7528;&#x8FD9;&#x4E9B;&#x65B9;&#x6CD5;&#x548C;&#x5C5E;&#x6027;&#x65F6;&#xFF0C;JS&#x5185;&#x90E8;&#x5DF2;&#x7ECF;&#x9690;&#x5F0F;&#x5730;&#x5E2E;&#x6211;&#x4EEC;&#x5E2E;&#x521B;&#x5EFA;&#x4E86;&#x4E00;&#x4E2A;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#x4E86;&#xFF0C;&#x4EE5;&#x4E0A;&#x7684;&#x5B9E;&#x9645;&#x7684;&#x60C5;&#x5F62;&#x5E94;&#x8BE5;&#x662F;&#x8FD9;&#x6837;&#x7684;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">new String(<span class="string">&quot;hello world&quot;</span>).length;</span><br><span class="line">new String(<span class="string">&quot;this a string&quot;</span>).indexOf(<span class="string">&quot;a&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>&#x4F46;&#x662F;&#x9690;&#x85CF;&#x4E0E;&#x663E;&#x5F0F;&#x521B;&#x5EFA;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#x662F;&#x6709;&#x533A;&#x522B;&#x7684;&#x3002;</p>
+<h1 id="&#x533A;&#x522B;"><a href="#&#x533A;&#x522B;" class="headerlink" title="&#x533A;&#x522B;"></a>&#x533A;&#x522B;</h1><ul>
+<li>&#x533A;&#x522B;1&#xFF1A;<br>&#x6D4F;&#x89C8;&#x5668;&#x81EA;&#x5DF1;&#x9690;&#x5F0F;&#x521B;&#x5EFA;&#x7684;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#x548C;&#x4F60;&#x663E;&#x5F0F;&#x521B;&#x5EFA;&#x7684;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#x4E0D;&#x4E25;&#x683C;&#x76F8;&#x7B49;&#x3002;&#x7B80;&#x5355;&#x6765;&#x8BF4;&#xFF0C;&#x867D;&#x7136;&#x8BF4;&#x8868;&#x9762;JS&#x5BF9;&#x4EB2;&#x751F;&#x7684;&#x4E0E;&#x9886;&#x517B;&#x7684;&#x4E00;&#x7167;&#x987E;&#xFF0C;&#x4F46;&#x4ECE;&#x9AA8;&#x5B50;&#x91CC;&#x6765;&#x8BF4;&#xFF0C;&#x4EB2;&#x751F;&#x7684;&#x80AF;&#x5B9A;&#x4E0D;&#x540C;&#x4E8E;&#x9886;&#x517B;&#x7684;&#x3002;</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var a1 = <span class="string">&quot;test&quot;</span>,</span><br><span class="line">    a2 = new String(<span class="string">&quot;test&quot;</span>);</span><br><span class="line">console.log(a1 == a2);//<span class="literal">true</span></span><br><span class="line">console.log(a1 === a2);//<span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>&#x533A;&#x522B;2&#xFF1A;<br>&#x9690;&#x5F0F;&#x521B;&#x5EFA;&#x7684;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#xFF0C;&#x5728;&#x4F7F;&#x7528;&#x5B8C;&#x540E;&#x4E4B;&#x540E;&#x5C31;&#x4F1A;&#x88AB;&#x629B;&#x5F03;&#x4E86;&#x3002;&#x7B80;&#x5355;&#x6765;&#x8BF4;&#x5C31;&#x662F;&#xFF0C;&#x4E00;&#x4E2A;&#x5927;&#x5927;&#x7684;&#x8D1F;&#x5FC3;&#x6C49;&#xFF0C;&#x4E0A;&#x5B8C;&#x6211;&#xFF0C;&#x5C31;&#x629B;&#x5F03;&#xFF0C;&#x8FD8;&#x91CD;&#x65B0;&#x53BB;&#x627E;&#x5176;&#x4ED6;&#x5BF9;&#x8C61;&#x3002;  </li>
+</ul>
+<p>&#x62FF;&#x6211;&#x4EEC;&#x5F00;&#x5934;&#x7684;&#x90A3;&#x9053;&#x9898;&#x6765;&#x8BF4;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">test.a = <span class="string">&quot;hello&quot;</span>;</span><br></pre></td></tr></table></figure>
+<p>&#x8FD9;&#x91CC;&#x9690;&#x5F0F;&#x521B;&#x5EFA;&#x4E86;&#x4E00;&#x4E2A;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#xFF0C;&#x6240;&#x4EE5;&#x8FD9;&#x91CC;&#x8D4B;&#x503C;&#x4E0D;&#x4F1A;&#x62A5;&#x9519;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">console.log(test.a);</span><br></pre></td></tr></table></figure>
+<p>&#x4E4B;&#x524D;&#x7684;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#x5DF2;&#x7ECF;&#x88AB;&#x629B;&#x5F03;&#x4E86;&#x3002;&#x4F46;&#x662F;&#x4F7F;&#x7528;&#x4E86;&#x201D;.&#x201D;&#x8FD0;&#x7B97;&#x7B26;&#xFF0C;&#x53C8;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x65B0;&#x7684;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#xFF0C;&#x7136;&#x800C;&#x8FD9;&#x4E2A;&#x5BF9;&#x8C61;&#x7684;&#x5C5E;&#x6027;a&#x5E76;&#x6CA1;&#x6709;&#x8D4B;&#x503C;&#xFF0C;&#x6240;&#x4EE5;&#x5C5E;&#x6027;a&#x7684;&#x503C;&#x662F;<strong>undefined</strong>&#x3002;</p>
+<h1 id="&#x5B9E;&#x9645;&#x8FD0;&#x7528;"><a href="#&#x5B9E;&#x9645;&#x8FD0;&#x7528;" class="headerlink" title="&#x5B9E;&#x9645;&#x8FD0;&#x7528;"></a>&#x5B9E;&#x9645;&#x8FD0;&#x7528;</h1><p>&#x8BF4;&#x5230;&#x5B9E;&#x9645;&#x8FD0;&#x7528;&#x4E2D;&#xFF0C;&#x6709;&#x7684;&#x6D4F;&#x89C8;&#x5668;&#x6027;&#x80FD;&#x4E0D;&#x662F;&#x5F88;&#x597D;&#xFF0C;&#x6BD4;&#x5982;&#x8BF4;&#x4F4E;&#x7248;&#x672C;IE&#xFF0C;&#x5F53;&#x9891;&#x7E41;&#x5904;&#x7406;&#x5B57;&#x7B26;&#x4E32;&#x65F6;&#xFF0C;&#x6548;&#x7387;&#x4F1A;&#x5F88;&#x4F4E;&#x3002;&#x6240;&#x4EE5;&#x5F88;&#x591A;&#x65F6;&#x5019;&#xFF0C;&#x6211;&#x4EEC;&#x8FD8;&#x4E0D;&#x5982;&#x76F4;&#x63A5;&#x663E;&#x5F0F;&#x5730;&#x521B;&#x5EFA;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#xFF0C;&#x9632;&#x6B62;&#x6D4F;&#x89C8;&#x5668;&#x8FC7;&#x591A;&#x5730;&#x521B;&#x5EFA;&#x9690;&#x5F0F;&#x7684;&#x5305;&#x88C5;&#x5BF9;&#x8C61;&#xFF0C;&#x63D0;&#x5347;&#x6027;&#x80FD;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var example = <span class="string">&quot;this is a example&quot;</span>;</span><br></pre></td></tr></table></figure>
+<p>&#x4E0D;&#x63A8;&#x8350;&#x4F7F;&#x7528;&#x79CD;&#x65B9;&#x6CD5;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var example2 = new String(<span class="string">&quot;this is a example&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>&#x63A8;&#x8350;&#x4F7F;&#x7528;&#x8FD9;&#x79CD;&#x65B9;&#x6CD5;&#xFF0C;&#x63D0;&#x5347;&#x6027;&#x80FD;&#x3002;</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Javascript/">Javascript</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Javascript/">Javascript</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	<div class="share-jiathis">
+	  
+<div class="jiathis_style_24x24">
+	<a class="jiathis_button_tsina"></a>
+	<a class="jiathis_button_weixin"></a>
+	<a class="jiathis_button_renren"></a>
+	<a class="jiathis_button_qzone"></a>
+	<a class="jiathis_button_googleplus"></a>
+	<a class="jiathis_button_douban"></a>
+	<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+	 </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/05/03/Css/Print-Css控制打印效果/" title="Print Css控制打印效果">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Print Css控制打印效果</span>
+</a>
+</div>
+
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/05/03/Javascript/谈谈JS的包装对象/" data-title="谈谈JS的包装对象" data-url="http://yoursite.com/2016/05/03/Javascript/谈谈JS的包装对象/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#测试题"><span class="toc-number">2.</span> <span class="toc-text">测试题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#定义"><span class="toc-number">3.</span> <span class="toc-text">定义</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#剖析"><span class="toc-number">4.</span> <span class="toc-text">剖析</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#区别"><span class="toc-number">5.</span> <span class="toc-text">区别</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#实际运用"><span class="toc-number">6.</span> <span class="toc-text">实际运用</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github 名片</p>
+<div class="github-card" data-github="littleBlack520" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Css/" title="Css">Css<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Javascript/" title="Javascript">Javascript<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 小黑博客 <br/>
+			关注web前端开发个人博客网站</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/littleBlack520" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="小黑">小黑</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"black"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
